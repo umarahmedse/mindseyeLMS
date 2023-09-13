@@ -2,7 +2,6 @@ class AppError extends Error {
   statusCode: number;
   status: string;
   isOperational: boolean;
-  code: number | undefined;
   constructor(message: string, statusCode: number) {
     super(message);
 
@@ -13,5 +12,4 @@ class AppError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
-
 export default AppError;
