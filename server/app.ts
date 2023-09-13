@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import errorHandler from "./utils/errorHandler";
 dotenv.config();
 const app = express();
 //body parser
@@ -28,4 +29,6 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
   error.statusCode = 404;
   next(error);
 });
+app.use(errorHandler);
 export default app;
+// 1:41
