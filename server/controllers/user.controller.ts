@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import userModel from "../models/user-model";
+import userModel, { InterfaceUser } from "../models/user-model";
 import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
 import {
+  InterfaceActivationRequest,
   InterfaceActivationToken,
   InterfaceRegistrationBody,
 } from "../utils/interfaces";
@@ -48,7 +49,33 @@ export const registerUser = catchAsync(
     }
   }
 );
-
+//User Activation Functionality
+export const activateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { activation_token, activation_code } =
+      req.body as InterfaceActivationRequest;
+    const newUser: { user: InterfaceUser; activationCode: string } = jwt.verify(
+      activation_token,
+      process.env.ACTIVATION_SECRET as string
+    ) as { user: InterfaceUser; activationCode: string };
+    const { email, name, password } = newUser.user;
+    if (newUser.activationCode !== activation_code) {
+      return next(new AppError("Invalid Code Provided", 401));
+    }
+    const isExisting = await userModel.findOne({ email });
+    if (isExisting) {
+      return next(new AppError("Email already exists", 400));
+    }
+    const user = await userModel.create({
+      email,
+      password,
+      name,
+    });
+    res.status(200).json({
+      success: true,
+    });
+  }
+);
 //UTILITY FUNCTIONS
 export const createActivationToken = (user: any): InterfaceActivationToken => {
   const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -62,4 +89,4 @@ export const createActivationToken = (user: any): InterfaceActivationToken => {
   );
   return { token, activationCode };
 };
-//2:27:55
+//2:46:15
