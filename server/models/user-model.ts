@@ -8,7 +8,7 @@ export interface InterfaceUser extends Document {
   name: string;
   email: string;
   password: string;
-  passwordConfirm: string | undefined;
+  // passwordConfirm: string | undefined;
   avatar: {
     public_id: string;
     url: string;
@@ -41,12 +41,12 @@ const userSchema: Schema<InterfaceUser> = new mongoose.Schema(
       minlength: [6, "password must be 6 characters long"],
       select: false,
     },
-    passwordConfirm: {
-      type: String,
-      required: [true, "please confirm your password"],
-      minlength: [6, "confirmed password must be 6 characters long"],
-      select: false,
-    },
+    // passwordConfirm: {
+    //   type: String,
+    //   required: [true, "please confirm your password"],
+    //   minlength: [6, "confirmed password must be 6 characters long"],
+    //   select: false,
+    // },
     avatar: {
       public_id: String,
       url: String,
@@ -72,7 +72,7 @@ const userSchema: Schema<InterfaceUser> = new mongoose.Schema(
 userSchema.pre<InterfaceUser>("save", async function (next) {
   if (!this.isModified("password")) next();
   this.password = await bcrypt.hash(this.password, 10);
-  this.passwordConfirm = undefined;
+  // this.passwordConfirm = undefined;
   next();
 });
 //Compare Password Functionality
