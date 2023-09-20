@@ -5,6 +5,7 @@ import catchAsync from "../utils/catchAsync";
 import {
   InterfaceActivationRequest,
   InterfaceActivationToken,
+  InterfaceLoginUser,
   InterfaceRegistrationBody,
 } from "../utils/interfaces";
 import jwt, { Secret } from "jsonwebtoken";
@@ -12,6 +13,7 @@ import dotenv from "dotenv";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
+import { sendToken } from "../utils/jwt";
 dotenv.config();
 //User Registration Functionality
 export const registerUser = catchAsync(
@@ -76,6 +78,34 @@ export const activateUser = catchAsync(
     });
   }
 );
+export const loginUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body as InterfaceLoginUser;
+    if (!email || !password) {
+      return next(new AppError("Please Provide Email And Password", 401));
+    }
+    const user = await userModel.findOne({ email }).select("+password");
+    if (!user) {
+      return next(new AppError("No User Found", 401));
+    }
+    const isPasswordMatching = await user.comparePassword(password);
+    if (!isPasswordMatching) {
+      return next(new AppError("Incorrect Credentials", 401));
+    }
+    sendToken(user, 200, res);
+  }
+);
+export const logoutUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.cookie("access_token", "", { maxAge: 1 });
+    res.cookie("refresh_token", "", { maxAge: 1 });
+    res.status(200).json({
+      success: true,
+      message: "Logout Successful",
+    });
+  }
+);
+//3:12
 //UTILITY FUNCTIONS
 export const createActivationToken = (user: any): InterfaceActivationToken => {
   const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -89,4 +119,3 @@ export const createActivationToken = (user: any): InterfaceActivationToken => {
   );
   return { token, activationCode };
 };
-//2:46:15
