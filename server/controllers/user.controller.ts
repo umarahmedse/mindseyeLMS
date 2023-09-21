@@ -8,12 +8,16 @@ import {
   InterfaceLoginUser,
   InterfaceRegistrationBody,
 } from "../utils/interfaces";
-import jwt, { Secret } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import dotenv from "dotenv";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
-import { sendToken } from "../utils/jwt";
+import {
+  accessTokenOptions,
+  refreshTokenOptions,
+  sendToken,
+} from "../utils/jwt";
 import redis from "../utils/redis";
 dotenv.config();
 //User Registration Functionality
@@ -107,6 +111,44 @@ export const logoutUser = catchAsync(
     });
   }
 );
+export const updateAccessToken = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const refresh_token = req.cookies.refresh_token as string;
+    const decoded = jwt.verify(
+      refresh_token,
+      process.env.REFRESH_TOKEN as string
+    ) as JwtPayload;
+    if (!decoded) {
+      return next(new AppError("Token Refresh Error", 400));
+    }
+    const session = (await redis.get(decoded.id)) as string;
+    if (!session) {
+      return next(new AppError("Token Refresh Error", 400));
+    }
+    const user = JSON.parse(session);
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN as string,
+      {
+        expiresIn: "5m",
+      }
+    );
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN as string,
+      {
+        expiresIn: "59m",
+      }
+    );
+    res.cookie("access_token", accessToken, accessTokenOptions);
+    res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+    res.status(200).json({
+      status: "success",
+      accessToken,
+    });
+  }
+);
+
 //3:12
 //UTILITY FUNCTIONS
 export const createActivationToken = (user: any): InterfaceActivationToken => {
@@ -121,4 +163,3 @@ export const createActivationToken = (user: any): InterfaceActivationToken => {
   );
   return { token, activationCode };
 };
-//3:23:31
