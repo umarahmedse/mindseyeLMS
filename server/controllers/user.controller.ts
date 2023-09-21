@@ -14,6 +14,7 @@ import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
+import redis from "../utils/redis";
 dotenv.config();
 //User Registration Functionality
 export const registerUser = catchAsync(
@@ -97,6 +98,7 @@ export const loginUser = catchAsync(
 );
 export const logoutUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    redis.del(req.user?._id);
     res.cookie("access_token", "", { maxAge: 1 });
     res.cookie("refresh_token", "", { maxAge: 1 });
     res.status(200).json({
@@ -119,3 +121,4 @@ export const createActivationToken = (user: any): InterfaceActivationToken => {
   );
   return { token, activationCode };
 };
+//3:23:31
