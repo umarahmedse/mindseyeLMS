@@ -24,14 +24,14 @@ export const sendToken = (
   );
   const accessTokenOptions: InterfaceTokenOptions = {
     expires: new Date(Date.now() + accessTokenExpires * 1000),
-    maxAge: accessTokenExpires * 1000,
+    maxAge: accessTokenExpires * 60 * 1000,
     httpOnly: true,
     sameSite: "lax",
   };
 
   const refreshTokenOptions: InterfaceTokenOptions = {
     expires: new Date(Date.now() + refreshTokenExpires * 1000),
-    maxAge: refreshTokenExpires * 1000,
+    maxAge: refreshTokenExpires * 60 * 1000,
     httpOnly: true,
     sameSite: "lax",
   };
