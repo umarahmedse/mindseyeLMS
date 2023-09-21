@@ -81,10 +81,17 @@ userSchema.pre<InterfaceUser>("save", async function (next) {
 });
 //sign access token
 userSchema.methods.signAccessToken = function () {
-  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || "");
+  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || "", {
+    expiresIn: "5m",
+  });
 };
 userSchema.methods.signRefreshToken = function () {
-  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || "");
+  return (
+    jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || ""),
+    {
+      expiresIn: "59m",
+    }
+  );
 };
 //Compare Password Functionality
 userSchema.methods.comparePassword = async function (
