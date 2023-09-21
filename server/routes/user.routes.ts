@@ -5,10 +5,11 @@ import {
   logoutUser,
   registerUser,
 } from "../controllers/user.controller";
+import { protect } from "../utils/auth";
 
 const router = express.Router();
 router.post("/register", registerUser);
 router.post("/activate", activateUser);
 router.post("/login", loginUser);
-router.get("/logout", logoutUser);
+router.get("/logout", protect, logoutUser);
 export default router;
