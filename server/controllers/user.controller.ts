@@ -19,6 +19,7 @@ import {
   sendToken,
 } from "../utils/jwt";
 import redis from "../utils/redis";
+import { getUserByID } from "../services/user.service";
 dotenv.config();
 //User Registration Functionality
 export const registerUser = catchAsync(
@@ -149,7 +150,12 @@ export const updateAccessToken = catchAsync(
   }
 );
 
-//3:12
+export const getUserInfo = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?._id;
+    getUserByID(userId, res);
+  }
+);
 //UTILITY FUNCTIONS
 export const createActivationToken = (user: any): InterfaceActivationToken => {
   const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
