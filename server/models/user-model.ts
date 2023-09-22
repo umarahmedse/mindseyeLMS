@@ -81,13 +81,18 @@ userSchema.pre<InterfaceUser>("save", async function (next) {
 });
 //sign access token
 userSchema.methods.signAccessToken = function () {
-  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || "", {
-    expiresIn: "5m",
-  });
+  return jwt.sign(
+    { id: this._id },
+    (process.env.ACCESS_TOKEN as string) || "",
+    {
+      expiresIn: "5m",
+    }
+  );
 };
 userSchema.methods.signRefreshToken = function () {
-  return (
-    jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || ""),
+  return jwt.sign(
+    { id: this._id },
+    (process.env.REFRESH_TOKEN as string) || "",
     {
       expiresIn: "59m",
     }
