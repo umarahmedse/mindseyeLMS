@@ -8,6 +8,7 @@ import {
   socialAuth,
   updateAccessToken,
   updatePassword,
+  updateProfilePicture,
   updateUserInfo,
 } from "../controllers/user.controller";
 import { protect } from "../utils/auth";
@@ -22,4 +23,5 @@ router.get("/me", protect, getUserInfo);
 router.get("/refreshtoken", updateAccessToken);
 router.patch("/update", protect, updateUserInfo);
 router.patch("/updatepassword", protect, updatePassword);
+router.patch("/updateavatar", protect, updateProfilePicture);
 export default router;
