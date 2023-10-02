@@ -66,7 +66,6 @@ const commentSchema = new Schema<InterfaceComment>({
 });
 const courseDataSchema = new Schema<InterfaceCourseData>({
   videoUrl: String,
-  videoThumbnail: Object,
   title: String,
   videoSection: Object,
   description: String,
@@ -96,11 +95,9 @@ const courseSchema = new Schema<InterfaceCourse>({
   thumbnail: {
     public_id: {
       type: String,
-      required: true,
     },
     url: {
       type: String,
-      required: true,
     },
   },
   tags: {
@@ -118,7 +115,7 @@ const courseSchema = new Schema<InterfaceCourse>({
   benefits: [{ title: String }],
   preRequisites: [{ title: String }],
   reviews: [reviewSchema],
-  courseData: [commentSchema],
+  courseData: [courseDataSchema],
   ratings: {
     type: Number,
     default: 0,
@@ -133,4 +130,3 @@ const courseModel: Model<InterfaceCourse> = mongoose.model(
   courseSchema
 );
 export default courseModel;
-// 4:38
