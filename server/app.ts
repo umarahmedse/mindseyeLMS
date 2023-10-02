@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import errorHandler from "./utils/errorHandler";
 import userRoutes from "./routes/user.routes";
+import courseRoutes from "./routes/course.routes";
 dotenv.config();
 const app = express();
 //logger
@@ -21,6 +22,7 @@ app.use(
   })
 );
 app.use("/api/v1", userRoutes);
+app.use("/api/v1", courseRoutes);
 //testing api
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({
