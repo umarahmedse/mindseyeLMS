@@ -7,6 +7,9 @@ import {
   InterfaceActivationToken,
   InterfaceLoginUser,
   InterfaceRegistrationBody,
+  InterfaceSocialLogin,
+  InterfaceUpdateUserInfo,
+  InterfaceUpdateUserPassword,
 } from "../utils/interfaces";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -20,6 +23,7 @@ import {
 } from "../utils/jwt";
 import redis from "../utils/redis";
 import { getUserByID } from "../services/user.service";
+import cloudinary from "cloudinary";
 dotenv.config();
 //User Registration Functionality
 export const registerUser = catchAsync(
@@ -141,6 +145,7 @@ export const updateAccessToken = catchAsync(
         expiresIn: "59m",
       }
     );
+    req.user = user;
     res.cookie("access_token", accessToken, accessTokenOptions);
     res.cookie("refresh_token", refreshToken, refreshTokenOptions);
     res.status(200).json({
@@ -154,6 +159,103 @@ export const getUserInfo = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?._id;
     getUserByID(userId, res);
+  }
+);
+export const socialAuth = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { name, email, password } = req.body as InterfaceSocialLogin;
+
+    const user = await userModel.findOne({ email });
+    if (user) {
+      sendToken(user, 200, res);
+    } else {
+      const newUser = await userModel.create({ email, name, password });
+      sendToken(newUser, 200, res);
+    }
+  }
+);
+export const updateUserInfo = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { name, email } = req.body as InterfaceUpdateUserInfo;
+    const userId = req.user?._id;
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return next(new AppError("User Not Found", 401));
+    }
+    if (email && user) {
+      const userEmail = await userModel.findOne({ email });
+      if (userEmail) {
+        return next(new AppError("Email already exists", 401));
+      }
+      user.email = email;
+    }
+    if (name) {
+      user.name = name;
+    }
+    await user?.save();
+    await redis.set(userId, JSON.stringify(user));
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  }
+);
+export const updatePassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { oldPassword, newPassword } =
+      req.body as InterfaceUpdateUserPassword;
+    if (!oldPassword || !newPassword) {
+      return next(new AppError("New and Old Password Required", 400));
+    }
+    const userLoggedIn = req?.user;
+    const user = await userModel
+      .findById(userLoggedIn?._id)
+      .select("+password");
+    if (!user) {
+      return next(new AppError("No User found", 500));
+    }
+    const isPasswordMatching = await user?.comparePassword(oldPassword);
+    console.log(isPasswordMatching);
+    if (!isPasswordMatching) {
+      return next(new AppError("Invalid old password", 401));
+    }
+    user.password = newPassword;
+
+    await user?.save();
+    await redis.set(req?.user?._id, JSON.stringify(user));
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  }
+);
+export const updateProfilePicture = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { avatar } = req.body;
+    const userId = req.user?._id;
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return next(new AppError("No User", 403));
+    }
+    if (avatar && user) {
+      if (user?.avatar.public_id) {
+        await cloudinary.v2.uploader.destroy(user?.avatar.public_id);
+      }
+      const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+        folder: "avatars",
+        width: 150,
+      });
+      user.avatar = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
+    }
+    await user?.save();
+    await redis.set(userId, JSON.stringify(user));
+    res.status(201).json({
+      success: true,
+      user,
+    });
   }
 );
 //UTILITY FUNCTIONS
