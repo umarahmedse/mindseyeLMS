@@ -18,7 +18,7 @@ const notificationSchema = new Schema<InterfaceNotification>(
   { timestamps: true }
 );
 const notificationModel: Model<InterfaceNotification> = mongoose.model(
-  "Order",
+  "Notification",
   notificationSchema
 );
 export default notificationModel;
