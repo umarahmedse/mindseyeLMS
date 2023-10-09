@@ -39,3 +39,24 @@ export interface InterfaceUpdateUserPassword {
 export interface InterfaceUpdateProfilePicture {
   avatar: string;
 }
+export interface InterfaceAddQuestionData {
+  question: string;
+  courseId: string;
+  contentId: string;
+}
+export interface InterfaceAddAnswerData {
+  questionId: string;
+  courseId: string;
+  contentId: string;
+  answer: string;
+}
+export interface InterfaceAddReviewData {
+  review: string;
+  rating: number;
+  userId: string;
+}
+export interface InterfaceAddReplyData {
+  comment: string;
+  reviewId: string;
+  courseId: string;
+}
