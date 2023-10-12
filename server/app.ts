@@ -6,6 +6,9 @@ import morgan from "morgan";
 import errorHandler from "./utils/errorHandler";
 import userRoutes from "./routes/user.routes";
 import courseRoutes from "./routes/course.routes";
+import orderRoutes from "./routes/order.routes";
+import notificationRoutes from "./routes/notification.routes";
+
 dotenv.config();
 const app = express();
 //logger
@@ -21,8 +24,7 @@ app.use(
     origin: process.env.ORIGINS,
   })
 );
-app.use("/api/v1", userRoutes);
-app.use("/api/v1", courseRoutes);
+app.use("/api/v1", userRoutes, courseRoutes, orderRoutes, notificationRoutes);
 //testing api
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const error = new Error(`${req.originalUrl} not found`) as any;
