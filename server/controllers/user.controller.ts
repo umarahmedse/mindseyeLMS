@@ -22,7 +22,7 @@ import {
   sendToken,
 } from "../utils/jwt";
 import redis from "../utils/redis";
-import { getUserByID } from "../services/user.service";
+import { getAllUsers, getUserByID } from "../services/user.service";
 import cloudinary from "cloudinary";
 dotenv.config();
 //User Registration Functionality
@@ -271,3 +271,10 @@ export const createActivationToken = (user: any): InterfaceActivationToken => {
   );
   return { token, activationCode };
 };
+//get all users --- admin only
+
+export const getAllUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    getAllUsers(res);
+  }
+);

@@ -8,7 +8,7 @@ import notificationModel from "../models/notification-model";
 import path from "path";
 import ejs from "ejs";
 import sendMail from "../utils/sendMail";
-import { newOrder } from "../services/order.service";
+import { getAllOrderList, newOrder } from "../services/order.service";
 
 //CREATE ORDER
 export const createOrder = catchAsync(
@@ -68,5 +68,11 @@ export const createOrder = catchAsync(
     await course.save();
 
     newOrder(data, res, next);
+  }
+);
+//get all orders - only admin
+export const getAllOrders = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    getAllOrderList(res);
   }
 );

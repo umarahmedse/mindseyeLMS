@@ -9,10 +9,12 @@ import {
   uploadCourse,
   addReview,
   addReply,
+  getAllCourse,
 } from "../controllers/course.controller";
 import { protect, restrictTo } from "../utils/auth";
 const router = express.Router();
 router.get("/getcourse/:id", getSingleCourse);
+router.get("/getallcourses", protect, restrictTo("admin"), getAllCourse);
 router.get("/getcourses", getAllCourses);
 router.get("/getcoursecontent/:id", protect, getCourseByUser);
 router.post("/createcourse", protect, restrictTo("admin"), uploadCourse);

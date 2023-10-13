@@ -33,4 +33,3 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 app.use(errorHandler);
 export default app;
-// 1:41

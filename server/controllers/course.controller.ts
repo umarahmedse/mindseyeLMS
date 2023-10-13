@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/AppError";
 import cloudinary from "cloudinary";
-import { createCourse } from "../services/course.service";
+import { createCourse, getAllCourseList } from "../services/course.service";
 import courseModel from "../models/course-model";
 import redis from "../utils/redis";
 import {
@@ -308,5 +308,11 @@ export const addReply = catchAsync(
       success: true,
       course,
     });
+  }
+);
+// get all courses -- admin only
+export const getAllCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    getAllCourseList(res);
   }
 );
