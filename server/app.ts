@@ -8,11 +8,11 @@ import userRoutes from "./routes/user.routes";
 import courseRoutes from "./routes/course.routes";
 import orderRoutes from "./routes/order.routes";
 import notificationRoutes from "./routes/notification.routes";
-
+import analyticsRoutes from "./routes/analytics.routes";
 dotenv.config();
 const app = express();
 //logger
-if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
+if (process.env.NODE_ENVIRONMENT === "development") app.use(morgan("dev"));
 else app.use(morgan("common"));
 //body parser
 app.use(express.json({ limit: "50mb" }));
@@ -24,7 +24,14 @@ app.use(
     origin: process.env.ORIGINS,
   })
 );
-app.use("/api/v1", userRoutes, courseRoutes, orderRoutes, notificationRoutes);
+app.use(
+  "/api/v1",
+  userRoutes,
+  courseRoutes,
+  orderRoutes,
+  notificationRoutes,
+  analyticsRoutes
+);
 //testing api
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const error = new Error(`${req.originalUrl} not found`) as any;
