@@ -13,7 +13,7 @@ import {
 } from "../utils/interfaces";
 import mongoose from "mongoose";
 import path from "path";
-import ejs from "ejs";
+import ejs, { closeDelimiter } from "ejs";
 import sendMail from "../utils/sendMail";
 import notificationModel from "../models/notification-model";
 //CREATE COURSE
@@ -314,5 +314,24 @@ export const addReply = catchAsync(
 export const getAllCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     getAllCourseList(res);
+  }
+);
+
+//delete course - only admin
+
+export const deleteCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const course = await courseModel.findById(id);
+
+    if (!course) {
+      return next(new AppError("No course found", 404));
+    }
+    await courseModel.deleteOne({ _id: id });
+    await redis.del(id);
+    res.status(201).json({
+      success: true,
+      message: "course deleted successfully",
+    });
   }
 );

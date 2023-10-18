@@ -22,7 +22,11 @@ import {
   sendToken,
 } from "../utils/jwt";
 import redis from "../utils/redis";
-import { getAllUsers, getUserByID } from "../services/user.service";
+import {
+  getAllUsers,
+  getUserByID,
+  updateUserRoleService,
+} from "../services/user.service";
 import cloudinary from "cloudinary";
 dotenv.config();
 //User Registration Functionality
@@ -276,5 +280,33 @@ export const createActivationToken = (user: any): InterfaceActivationToken => {
 export const getAllUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     getAllUsers(res);
+  }
+);
+
+//update user role - only admin
+
+export const updateUserRole = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id, role } = req.body;
+    updateUserRoleService(res, id, role);
+  }
+);
+
+//delete user - only admin
+
+export const deleteUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    const user = await userModel.findById(id);
+    if (!user) {
+      return next(new AppError("No user found", 404));
+    }
+    await userModel.deleteOne({ id });
+    await redis.del(id);
+    res.status(201).json({
+      success: true,
+      message: "user deleted successfully",
+    });
   }
 );
