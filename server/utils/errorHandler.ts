@@ -1,6 +1,7 @@
 import AppError from "./AppError";
 import { Request, Response, NextFunction } from "express";
-
+import dotenv from "dotenv";
+dotenv.config();
 const handleCastErrorDB = (err: any) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
@@ -60,10 +61,10 @@ const sendErrorProd = (err: AppError, req: Request, res: Response) => {
 export default (err: any, req: Request, res: Response, next: NextFunction) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "Internal Server Error";
-
-  if (process.env.NODE_ENV === "development") {
+  // console.log(process.env.NODE_ENVIRONMENT);
+  if (process.env.NODE_ENVIRONMENT === "development") {
     sendErrorDev(err, req, res);
-  } else if (process.env.NODE_ENV === "production") {
+  } else if (process.env.NODE_ENVIRONMENT === "production") {
     let error = { ...err };
     error.name = err.name;
     error.message = err.message;
