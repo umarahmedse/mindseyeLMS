@@ -9,6 +9,8 @@ import courseRoutes from "./routes/course.routes";
 import orderRoutes from "./routes/order.routes";
 import notificationRoutes from "./routes/notification.routes";
 import analyticsRoutes from "./routes/analytics.routes";
+import layoutRoutes from "./routes/layouts.routes";
+
 dotenv.config();
 const app = express();
 //logger
@@ -30,7 +32,8 @@ app.use(
   courseRoutes,
   orderRoutes,
   notificationRoutes,
-  analyticsRoutes
+  analyticsRoutes,
+  layoutRoutes
 );
 //testing api
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
@@ -40,3 +43,4 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 app.use(errorHandler);
 export default app;
+//8:00
