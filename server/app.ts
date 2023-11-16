@@ -35,7 +35,6 @@ app.use(
   analyticsRoutes,
   layoutRoutes
 );
-//testing api
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const error = new Error(`${req.originalUrl} not found`) as any;
   error.statusCode = 404;
@@ -43,4 +42,3 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 app.use(errorHandler);
 export default app;
-//8:00
