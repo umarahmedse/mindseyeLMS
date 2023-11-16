@@ -86,7 +86,7 @@ export const getSingleCourse = catchAsync(
       if (!course) {
         return next(new AppError("course not found", 400));
       }
-      await redis.set(courseId, JSON.stringify(course));
+      await redis.set(courseId, JSON.stringify(course), "EX", 608400); //7d expire
       res.status(201).json({
         success: true,
         course,

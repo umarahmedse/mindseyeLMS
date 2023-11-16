@@ -20,7 +20,7 @@ export const protect = catchAsync(
     }
     const user = await redis.get(decoded.id);
     if (!user) {
-      return next(new AppError("User not found", 401));
+      return next(new AppError("Please Log-In To Access Resource", 401));
     }
     req.user = JSON.parse(user);
     next();

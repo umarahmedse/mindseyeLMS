@@ -3,6 +3,7 @@ import { Response } from "express";
 import { InterfaceUser } from "../models/user-model";
 import redis from "./redis";
 import { InterfaceTokenOptions } from "./interfaces";
+dotenv.config();
 export const accessTokenExpires = parseInt(
   process.env.ACCESS_TOKEN_EXPIRES || "300",
   10
@@ -35,7 +36,7 @@ export const sendToken = (
   redis.set(user._id, JSON.stringify(user) as any);
   //parse env variables to integrate with fallback values
 
-  if ((process.env.NODE_ENV = "production")) {
+  if ((process.env.NODE_ENVIRONMENT = "production")) {
     accessTokenOptions.secure = true;
   }
 
