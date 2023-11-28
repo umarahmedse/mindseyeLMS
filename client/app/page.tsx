@@ -20,4 +20,3 @@ const Page: FC<Props> = (props) => {
 };
 
 export default Page;
-// 15:46
